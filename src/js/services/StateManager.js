@@ -17,7 +17,7 @@ export default class StateManager {
     loadState() {
         const savedStateJSON = localStorage.getItem(PERSISTENT_STATE_KEY);
         if (!savedStateJSON) {
-            this.createNewSchedule('برنامه ۱', false);
+            this.createNewSchedule('برنامه اصلی', false);
             return;
         }
         try {
@@ -25,16 +25,22 @@ export default class StateManager {
             this.schedules = savedState.schedules || {};
             this.activeScheduleId = savedState.activeScheduleId || null;
             this.userGender = savedState.userGender || null;
+            this.allClasses = savedState.allClasses || []; // Load saved classes
+            
             if (!this.schedules[this.activeScheduleId] && Object.keys(this.schedules).length > 0) {
                 this.activeScheduleId = Object.keys(this.schedules)[0];
             }
             if (Object.keys(this.schedules).length === 0) {
-                 this.createNewSchedule('برنامه ۱', false);
+                 this.createNewSchedule('برنامه اصلی', false);
+            }
+            
+            // Re-apply filter if classes exist
+            if (this.allClasses.length > 0) {
+                this.filterClasses('');
             }
         } catch (error) {
-            console.error("Error loading state from localStorage:", error);
             localStorage.removeItem(PERSISTENT_STATE_KEY);
-            this.createNewSchedule('برنامه ۱', false);
+            this.createNewSchedule('برنامه اصلی', false);
         }
     }
 
@@ -44,20 +50,22 @@ export default class StateManager {
                 schedules: this.schedules,
                 activeScheduleId: this.activeScheduleId,
                 userGender: this.userGender,
+                allClasses: this.allClasses // Save all classes to persistence
             };
             localStorage.setItem(PERSISTENT_STATE_KEY, JSON.stringify(stateToSave));
         } catch (error) {
-            console.error("Could not save state to localStorage:", error);
+            console.error("Storage error (Quota exceeded?):", error);
         }
     }
 
     setAllClasses(classes) {
         this.allClasses = classes;
-        const removedClassesLog = this._verifySchedulesWithNewData();
+        const removed = this._verifySchedulesWithNewData();
         this.filterClasses(''); 
         this.saveState(); 
-        return removedClassesLog;
+        return removed;
     }
+
     _verifySchedulesWithNewData() {
         const removedClassesLog = [];
         if (!this.allClasses || this.allClasses.length === 0) return removedClassesLog;
@@ -65,27 +73,22 @@ export default class StateManager {
         for (const scheduleId in this.schedules) {
             const schedule = this.schedules[scheduleId];
             
-            const updatedAndExistingClasses = schedule.classes
-                .map(savedClass => {
-                    const freshClass = this.allClasses.find(c => c.id_group === savedClass.id_group);
-                    if (!freshClass) {
-                        removedClassesLog.push({ ...savedClass, scheduleName: schedule.name, reason: ' دیگر ارائه نمی‌شود' });
-                        return null;
-                    }
-                    return freshClass;
-                })
-                .filter(Boolean); 
-            const finalVerifiedClasses = [];
-            updatedAndExistingClasses.forEach(classToCheck => {
-                const conflicts = ScheduleService.findConflicts(classToCheck, finalVerifiedClasses);
-                if (conflicts.length > 0) {
-                    removedClassesLog.push({ ...classToCheck, scheduleName: schedule.name, reason: ' به دلیل تداخل زمانی جدید حذف شد' });
+            const verified = [];
+            schedule.classes.forEach(savedClass => {
+                const freshClass = this.allClasses.find(c => c.id_group === savedClass.id_group);
+                
+                if (!freshClass) {
+                    removedClassesLog.push({ ...savedClass, scheduleName: schedule.name, reason: 'حذف از سیستم' });
+                    return;
+                }
+
+                if (ScheduleService.findConflicts(freshClass, verified).length > 0) {
+                    removedClassesLog.push({ ...freshClass, scheduleName: schedule.name, reason: 'تداخل جدید' });
                 } else {
-                    finalVerifiedClasses.push(classToCheck);
+                    verified.push(freshClass);
                 }
             });
-
-            schedule.classes = finalVerifiedClasses;
+            schedule.classes = verified;
         }
         return removedClassesLog;
     }
@@ -114,7 +117,7 @@ export default class StateManager {
     }
 
     createNewSchedule(name, shouldSave = true) {
-        const id = `schedule-${Date.now()}`;
+        const id = `sched_${Date.now()}`;
         this.schedules[id] = { id, name, classes: [] };
         this.activeScheduleId = id;
         if (shouldSave) this.saveState();
@@ -129,9 +132,7 @@ export default class StateManager {
     }
 
     deleteActiveSchedule() {
-        if (!this.activeScheduleId || Object.keys(this.schedules).length <= 1) {
-            return false;
-        }
+        if (!this.activeScheduleId || Object.keys(this.schedules).length <= 1) return false;
         delete this.schedules[this.activeScheduleId];
         this.activeScheduleId = Object.keys(this.schedules)[0];
         this.saveState();
@@ -141,9 +142,8 @@ export default class StateManager {
     addClassToActiveSchedule(classId) {
         const schedule = this.getActiveSchedule();
         const classToAdd = this.allClasses.find(c => c.id_group === classId);
-        if (!schedule || !classToAdd || schedule.classes.some(c => c.id_group === classId)) {
-            return false;
-        }
+        if (!schedule || !classToAdd || schedule.classes.some(c => c.id_group === classId)) return false;
+        
         schedule.classes.push(classToAdd);
         this.saveState();
         return true;

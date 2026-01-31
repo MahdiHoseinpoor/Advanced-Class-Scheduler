@@ -2,139 +2,248 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برنامه‌ریز پیشرفته انتخاب واحد</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SBU Scheduler Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
 
-    <header class="main-header">
-        <h1>برنامه‌ریز پیشرفته انتخاب واحد</h1>
-        <p class="developer-credit">توسعه یافته توسط <a href="https://github.com/MahdiHoseinpoor" target="_blank" rel="noopener noreferrer">مهدی حسین پور</a></p>
-    </header>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>برنامه‌ریز درسی</span>
+            </div>
+            
+            <div class="sidebar-scroll-area">
+                <!-- Data Source Panel -->
+                <div class="panel">
+                    <h6 class="panel-title">
+                        <span>منبع داده</span>
+                        <span id="file-name" style="font-weight:400; text-transform:none; font-size:0.75rem; color:var(--primary)"></span>
+                    </h6>
 
-    <div class="container">
-        
-        <details class="instructions-container" open>
-            <summary>راهنمای سریع (برای نمایش/پنهان کردن کلیک کنید)</summary>
-            <div class="instructions-content">
-                <h4>مرحله اول: دریافت داده‌های دروس از سامانه بهستان</h4>
-                <ol>
-                    <li>وارد سامانه دانشگاه شوید: <strong><a href="https://ems.sbu.ac.ir/" target="_blank" rel="noopener noreferrer">ems.sbu.ac.ir</a></strong></li>
-                    <li>به بخش گزارش‌ها بروید و <strong>گزارش ۲۱۲ (لیست دروس ارائه شده)</strong> را باز کنید.</li>
-                    <li>با زدن کلید `F12` (یا `Ctrl+Shift+I`) ابزار توسعه‌دهندگان مرورگر (Developer Tools) را باز کنید.</li>
-                    <li>به تب <strong>Network</strong> بروید.</li>
-                    <li>در گزارش ۲۱۲، پارامترهای مورد نظر خود (مثلاً دانشکده) را انتخاب و دکمه "مشاهده گزارش" را بزنید.</li>
-                    <li>در تب Network، به دنبال یک درخواست با نام <code>BAS0237_CMP_ViewReport.svc</code> بگردید.</li>
-                    <li>روی <code>BAS0237_CMP_ViewReport.svc</code> کلیک کرده و در پنل باز شده، به تب <strong>Response</strong> بروید.</li>
-                    <li><strong>تمام محتوای متنی</strong> داخل این تب را کپی کنید (از `{` اول تا `}` آخر).</li>
-                </ol>
-                <h4>مرحله دوم: بارگذاری داده‌ها در این برنامه</h4>
-                <p>داده‌های کپی شده را از طریق یکی از دو روش زیر وارد کنید:</p>
-            </div>
-        </details>
-
-        <div class="section" id="data-loader">
-            <h2>۱. بارگذاری داده‌ها</h2>
-            <div class="input-tabs">
-                <button class="tab-btn active" data-tab="file-tab">بارگذاری از فایل</button>
-                <button class="tab-btn" data-tab="paste-tab">چسباندن متن</button>
-            </div>
-            <div id="file-tab" class="tab-content active">
-                <label for="file-input" class="file-label">انتخاب فایل پاسخ سرور (.txt/.json)</label>
-                <input type="file" id="file-input" accept=".txt, .json">
-                <span id="file-name">فایلی انتخاب نشده است</span>
-            </div>
-            <div id="paste-tab" class="tab-content">
-                <textarea id="paste-area" placeholder="محتوای فایل پاسخ سرور را اینجا بچسبانید..."></textarea>
-                <button id="paste-btn" class="paste-button">پردازش متن</button>
-            </div>
-        </div>
-
-        <div class="main-layout">
-            <aside class="sidebar">
-                <div class="section">
-                    <h2>۲. تنظیمات کاربر</h2>
-                    <div id="gender-selector" class="gender-selector">
-                        <label>جنسیت شما:</label>
-                        <div>
-                            <input type="radio" id="gender-male" name="gender" value="male">
-                            <label for="gender-male">مرد</label>
+                    <!-- Quick Guide -->
+                    <details class="guide-box">
+                        <summary class="guide-summary">راهنمای سریع (کلیک کنید)</summary>
+                        <div class="guide-content">
+                            <div class="guide-step">
+                                <strong>۱. دریافت داده‌ها:</strong>
+                                وارد سامانه <code>ems.sbu.ac.ir</code> شوید. گزارش ۲۱۲ را باز کنید.
+                            </div>
+                            <div class="guide-step">
+                                <strong>۲. ابزار توسعه‌دهنده:</strong>
+                                کلید <span class="code-block">F12</span> را بزنید. به تب <strong>Network</strong> بروید.
+                            </div>
+                            <div class="guide-step">
+                                <strong>۳. کپی Response:</strong>
+                                دکمه «مشاهده گزارش» را بزنید. روی درخواست <span class="code-block">BAS0237_CMP_ViewReport.svc/</span> کلیک کنید. از تب <strong>Response</strong> تمام متن را کپی کنید.
+                            </div>
+                            <div class="guide-step" style="border:none">
+                                <strong>۴. بارگذاری:</strong>
+                                متن کپی شده را در کادر زیر قرار دهید و دکمه پردازش را بزنید.
+                            </div>
                         </div>
-                        <div>
-                            <input type="radio" id="gender-female" name="gender" value="female">
-                            <label for="gender-female">زن</label>
-                        </div>
+                    </details>
+
+                    <div style="display:grid; grid-template-columns: 1fr; gap:0.5rem">
+                        <label class="btn" style="width:100%; justify-content:center">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            انتخاب فایل
+                            <input type="file" id="file-input" accept=".json,.txt" hidden>
+                        </label>
+                        <textarea id="paste-area" placeholder="یا متن Response را اینجا بچسبانید..."></textarea>
+                        <button id="paste-btn" class="btn primary" style="width:100%">پردازش</button>
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2>۳. برنامه‌های من</h2>
-                    <div class="input-group">
+                <div class="panel">
+                    <h6 class="panel-title">تنظیمات جنسیت</h6>
+                    <div id="gender-selector" class="radio-group">
+                        <input type="radio" id="g-male" name="gender" value="male">
+                        <label for="g-male">آقا</label>
+                        <input type="radio" id="g-female" name="gender" value="female">
+                        <label for="g-female">خانم</label>
+                    </div>
+                </div>
+
+                <div class="panel panel-flex-grow">
+                    <h6 class="panel-title" style="margin-bottom:0.5rem">
+                        برنامه‌های من
+                        <div class="toolbar" style="gap:2px">
+                            <button id="new-schedule-btn" class="btn icon-only" style="width:28px; height:28px; padding:0" title="جدید" data-icon="plus"></button>
+                            <button id="rename-schedule-btn" class="btn icon-only" style="width:28px; height:28px; padding:0" title="تغییر نام" data-icon="edit"></button>
+                            <button id="delete-schedule-btn" class="btn icon-only" style="width:28px; height:28px; padding:0; color:var(--danger)" title="حذف" data-icon="trash"></button>
+                        </div>
+                    </h6>
+                    
+                    <div class="input-group" style="margin-bottom:0.5rem">
                         <select id="schedule-selector"></select>
                     </div>
-                    <div class="input-group schedule-controls">
-                        <button id="new-schedule-btn">برنامه جدید</button>
-                        <button id="rename-schedule-btn">تغییر نام</button>
-                        <button id="delete-schedule-btn">حذف</button>
-                    </div>
-                </div>
 
-                <div class="section">
-                    <h2>برنامه فعال <span id="total-units"></span></h2>
-                    <button id="view-calendar-btn" class="view-calendar-button">نمایش تقویم هفتگی</button>
-                    <ul id="selected-classes-list"><p class="placeholder">یک برنامه را انتخاب کنید.</p></ul>
-                </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:var(--text-secondary); padding:0 5px">
+                        <span>لیست دروس</span>
+                        <span id="total-units" style="font-weight:700; color:var(--primary)">0 واحد</span>
+                    </div>
 
-                 <div class="section">
-                    <h2>ابزارها</h2>
-                    <div class="input-group">
-                        <input type="text" id="manual-add-input" placeholder="کد درس را وارد کنید...">
-                        <button id="manual-add-btn">افزودن</button>
+                    <div id="selected-classes-list" class="selected-list-container"></div>
+                    
+                    <button id="view-calendar-btn" class="btn primary" style="width:100%; margin-top:auto" data-icon="calendar">مشاهده تقویم هفتگی</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div style="display:flex; align-items:center; gap:1rem; width:100%">
+                    <button id="sidebar-toggle" class="btn icon-only" style="background:transparent; border:1px solid var(--border); display:none">
+                        <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    
+                    <div class="search-bar-container">
+                        <div class="search-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                        <input type="text" id="search-input" class="search-input" placeholder="جستجوی درس، استاد...">
                     </div>
-                    <div class="input-group">
-                        <input type="text" id="search-input" placeholder="جستجوی کلاس‌های موجود...">
+
+                    <div style="margin-right:auto; display:flex; gap:0.5rem">
+                         <div class="input-group" style="margin:0; display:none; @media(min-width:600px){display:flex}">
+                            <input type="text" id="manual-add-input" class="input-field" placeholder="کد درس" style="width:100px; text-align:center">
+                            <button id="manual-add-btn" class="btn" style="background:var(--border); color:var(--text-primary)" data-icon="plus"></button>
+                        </div>
+                        <button id="auto-scheduler-btn" class="btn" style="background:linear-gradient(135deg, #007AFF, #5856D6); color:white; border:none;" data-icon="magic">چینش هوشمند</button>
                     </div>
                 </div>
-            </aside>
-            <main class="main-content">
-                <div class="section">
-                    <h2>۴. تمام کلاس‌های ارائه شده</h2>
-                    <div class="table-container">
-                        <table id="classes-table">
-                            <thead><tr><th>انتخاب</th><th>کد درس</th><th>نام درس</th><th>استاد</th><th>زمان کلاس</th><th>زمان امتحان</th></tr></thead>
-                            <tbody id="classes-tbody"><tr><td colspan="6" class="placeholder">برای شروع، یک فایل داده بارگذاری کنید.</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
+            </header>
+
+            <div class="table-wrapper">
+                <table id="classes-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px"></th>
+                            <th style="width:90px">کد گروه</th>
+                            <th>نام درس</th>
+                            <th>استاد</th>
+                            <th>زمان کلاس</th>
+                            <th>امتحان</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classes-tbody"></tbody>
+                </table>
+                <div id="mobile-cards-container" class="mobile-cards"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="conflict-modal" class="modal-backdrop">
+        <div class="modal" style="max-width:450px">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:var(--danger)">تداخل زمانی</h3>
+                <button class="modal-close" data-icon="close"></button>
+            </div>
+            <div class="modal-body" id="conflict-details"></div>
         </div>
     </div>
 
-    <!-- Modals -->
-    <div id="conflict-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-btn">&times;</button>
-            <h3>تداخل در برنامه</h3>
-            <div id="conflict-details"></div>
-        </div>
-    </div>
-    
-    <div id="visual-schedule-modal" class="modal-overlay">
-        <div class="modal-content wide">
-            <button class="modal-close-btn">&times;</button>
-            <h3>نمای تقویم هفتگی</h3>
-            <div id="visual-schedule-container" class="visual-schedule-container"></div>
+    <div id="visual-schedule-modal" class="modal-backdrop">
+        <div class="modal" style="width:95vw; height:92vh; max-width:1300px">
+            <div class="modal-header">
+                <h3 class="modal-title">تقویم هفتگی</h3>
+                <button class="modal-close" data-icon="close"></button>
+            </div>
+            <div class="modal-body" id="visual-schedule-container" style="padding:0"></div>
         </div>
     </div>
 
-    <footer class="main-footer">
-        <p>مشاهده سورس کد پروژه در <a href="https://github.com/MahdiHoseinpoor/Advanced-Class-Scheduler" target="_blank" rel="noopener noreferrer">گیت‌هاب</a></p>
-    </footer>
+    <div id="auto-scheduler-modal" class="modal-backdrop">
+        <div class="modal" style="max-width:1000px; height:85vh">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display:flex; align-items:center; gap:10px">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    چینش هوشمند
+                </h3>
+                <button class="modal-close" data-icon="close"></button>
+            </div>
+            <div class="modal-body as-layout">
+                <div class="as-sidebar">
+                    <div>
+                        <label style="font-weight:700; display:block; margin-bottom:12px; color:var(--text-primary)">ترجیحات زمانی</label>
+                        <div id="as-time-prefs"></div>
+                    </div>
+                    <div>
+                         <label style="font-weight:700; display:block; margin-bottom:8px; color:var(--text-primary)">اساتید محبوب</label>
+                         <input type="text" id="as-prof-search" class="input-field" placeholder="جستجوی استاد..." style="margin-bottom:8px; font-size:0.8rem">
+                         <div id="as-prof-list" class="prof-list-container"></div>
+                    </div>
+                    <div>
+                        <label style="font-weight:700; display:block; margin-bottom:12px; color:var(--text-primary)">محدوده واحد</label>
+                        <div style="display:flex; gap:10px">
+                            <input type="number" id="as-min-units" class="input-field" value="12" placeholder="Min" style="text-align:center">
+                            <div style="display:flex; align-items:center; color:var(--text-secondary)">تا</div>
+                            <input type="number" id="as-max-units" class="input-field" value="20" placeholder="Max" style="text-align:center">
+                        </div>
+                    </div>
+                    <div id="as-current-units" style="font-size:0.85rem; text-align:center; color:var(--text-secondary); margin-top:5px"></div>
+                    <button id="as-generate-btn" class="btn primary" style="margin-top:auto; height:50px; font-size:1rem" data-icon="magic">شروع پردازش</button>
+                </div>
+                
+                <div class="as-main">
+                    <!-- Selection View -->
+                    <div id="as-selection-view" class="as-view-section">
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:12px; background:#F0F8FF; padding:10px; border-radius:8px; border:1px solid #D6E4FF; color:#004085">
+                            اولویت دروس را مشخص کنید. در صورت انتخاب «الزامی»، تداخل‌ها به صورت آنی نمایش داده می‌شوند.
+                        </p>
+                        <div style="display:flex; padding:0 10px 5px 10px; font-size:0.8rem; font-weight:700; color:var(--text-secondary)">
+                            <span style="flex:1">نام درس</span>
+                            <span>اولویت</span>
+                        </div>
+                        <div id="as-course-list" style="flex:1; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius); margin-bottom:1rem; background:white"></div>
+                    </div>
 
-     <script type="module" src="src/js/Main.js" defer></script>
+                    <!-- Results View -->
+                    <div id="as-results-view" class="as-view-section hidden">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0;">
+                            <h4 style="margin:0">نتایج پیشنهادی</h4>
+                            <button id="as-back-btn" class="btn" style="font-size:0.8rem; padding:4px 10px">بازگشت به تنظیمات</button>
+                        </div>
+                        <div id="as-results-container" class="as-results-wrapper"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="src/js/Main.js"></script>
+    <script>
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        function checkMobile() {
+            if(window.innerWidth <= 900) {
+                if(toggle) toggle.style.display = 'flex';
+            } else {
+                if(toggle) toggle.style.display = 'none';
+                sidebar.classList.remove('open');
+            }
+        }
+        
+        if(toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggle) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+        
+        window.addEventListener('resize', checkMobile);
+        checkMobile();
+    </script>
 </body>
 </html>
